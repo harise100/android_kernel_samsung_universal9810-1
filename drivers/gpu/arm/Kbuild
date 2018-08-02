@@ -9,7 +9,21 @@
 #
 #
 
+ifeq ($(CONFIG_MALI_TMIX),y)
+	ifeq ($(CONFIG_MALI_TMIX_R5P0),y)
+		obj-y += tMIx/r5p0/
+	endif
+endif
 ifeq ($(CONFIG_MALI_THEX),y)
+	ifeq ($(CONFIG_MALI_THEX_R5P0),y)
+		obj-y += tHEx/r5p0/
+	endif
+	ifeq ($(CONFIG_MALI_THEX_R7P0),y)
+		obj-y += tHEx/r7p0/
+	endif
+	ifeq ($(CONFIG_MALI_THEX_R8P0),y)
+		obj-y += tHEx/r8p0/
+	endif
 	ifeq ($(CONFIG_MALI_THEX_R9P0),y)
 		obj-y += tHEx/r9p0/
 	endif

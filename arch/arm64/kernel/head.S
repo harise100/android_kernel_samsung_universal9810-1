@@ -251,14 +251,11 @@ ENDPROC(stext)
  */
 preserve_boot_args:
 	mov	x21, x0				// x21=FDT
-
 	adr_l	x0, boot_args			// record the contents of
 	stp	x21, x1, [x0]			// x0 .. x3 at kernel entry
 	stp	x2, x3, [x0, #16]
-
 	dmb	sy				// needed before dc ivac with
 						// MMU off
-
 	add	x1, x0, #0x20			// 4 x 8 bytes
 	b	__inval_cache_range		// tail call
 ENDPROC(preserve_boot_args)
@@ -832,7 +829,6 @@ __primary_switch:
 	mov	x19, x0				// preserve new SCTLR_EL1 value
 	mrs	x20, sctlr_el1			// preserve old SCTLR_EL1 value
 #endif
-
 	bl	__enable_mmu
 #ifdef CONFIG_RELOCATABLE_KERNEL
 	bl	__relocate_kernel
@@ -869,3 +865,4 @@ __primary_switch:
 	adrp	x0, __PHYS_OFFSET
 	br	x8
 ENDPROC(__primary_switch)
+

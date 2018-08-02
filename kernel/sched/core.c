@@ -1596,6 +1596,7 @@ static int select_fallback_rq(int cpu, struct task_struct *p)
 			/* fall-through */
 		case possible:
 			do_set_cpus_allowed(p, cpu_possible_mask);
+
 			state = fail;
 			break;
 

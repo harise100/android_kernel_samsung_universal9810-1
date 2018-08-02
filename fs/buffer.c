@@ -3131,6 +3131,8 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
 	bio->bi_end_io = end_bio_bh_io_sync;
 	bio->bi_private = bh;
 	bio->bi_flags |= bio_flags;
+	if (unlikely(test_clear_buffer_bypass(bh)))
+		bio->bi_sec_flags = SEC_BYPASS;
 
 	/* Take care of bh's that straddle the end of the device */
 	guard_bio_eod(op, bio);
@@ -3143,6 +3145,12 @@ static int submit_bh_wbc(int op, int op_flags, struct buffer_head *bh,
 		op_flags |= REQ_SYNC;
 		clear_buffer_sync_flush(bh);
 	}
+#ifdef CONFIG_JOURNAL_DATA_TAG
+	if (buffer_journal(bh)) {
+		bio_set_flag(bio, BIO_JOURNAL);
+		clear_buffer_journal(bh);
+	}
+#endif
 
 	bio_set_op_attrs(bio, op, op_flags);
 

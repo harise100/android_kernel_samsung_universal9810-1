@@ -3571,7 +3571,6 @@ static inline void check_schedstat_required(void)
 #endif
 }
 
-
 /*
  * MIGRATION
  *
@@ -10839,5 +10838,4 @@ __init void init_sched_fair_class(void)
 	zalloc_cpumask_var(&nohz.idle_cpus_mask, GFP_NOWAIT);
 #endif
 #endif /* SMP */
-
 }

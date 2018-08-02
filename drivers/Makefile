@@ -161,7 +161,11 @@ obj-$(CONFIG_VIRT_DRIVERS)	+= virt/
 obj-$(CONFIG_HYPERV)		+= hv/
 
 obj-$(CONFIG_PM_DEVFREQ)	+= devfreq/
-obj-$(CONFIG_BATTERY_SAMSUNG)   += battery_v2/
+ifeq ($(CONFIG_BATTERY_SAMSUNG_V2), y)
+  obj-$(CONFIG_BATTERY_SAMSUNG)   += battery_v2/
+else
+  obj-$(CONFIG_BATTERY_SAMSUNG)   += battery/
+endif
 obj-$(CONFIG_EXTCON)		+= extcon/
 obj-$(CONFIG_MEMORY)		+= memory/
 obj-$(CONFIG_IIO)		+= iio/
@@ -193,6 +197,9 @@ obj-y	+= motor/
 # CCIC
 obj-y	+= ccic/
 
+# Gator for ARM DS5 tool
+obj-$(CONFIG_GATOR)	+= gator_5.27/
+
 obj-$(CONFIG_EXYNOS_BTS)	+= bts/
 
 # Mobicore driver
@@ -203,3 +210,6 @@ obj-$(CONFIG_VISION_SUPPORT)	+= vision/
 
 #Fingerprint
 obj-$(CONFIG_SENSORS_FINGERPRINT)       += fingerprint/
+
+# uH
+obj-$(CONFIG_UH)		+= uh/

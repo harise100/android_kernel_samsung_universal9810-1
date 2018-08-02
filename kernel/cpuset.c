@@ -865,6 +865,7 @@ static void update_tasks_cpumask(struct cpuset *cs)
 	css_task_iter_start(&cs->css, &it);
 	while ((task = css_task_iter_next(&it)))
 		set_cpus_allowed_ptr(task, cs->effective_cpus);
+
 	css_task_iter_end(&it);
 }
 
@@ -2241,7 +2242,6 @@ hotplug_update_tasks(struct cpuset *cs,
 	cpumask_copy(cs->effective_cpus, new_cpus);
 	cs->effective_mems = *new_mems;
 	spin_unlock_irq(&callback_lock);
-
 #if 0
 	if (cpus_updated)
 		update_tasks_cpumask(cs);

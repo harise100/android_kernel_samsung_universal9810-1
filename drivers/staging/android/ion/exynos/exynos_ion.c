@@ -453,8 +453,9 @@ static int __init exynos_ion_reserved_mem_setup(struct reserved_mem *rmem)
 
 		heap_data->type = ION_HEAP_TYPE_DMA;
 
-		ret = cma_init_reserved_mem(heap_data->base,
-				heap_data->size, 0, &cma);
+		ret = cma_init_reserved_mem_with_name(
+				heap_data->base, heap_data->size, 0, &cma,
+				heap_data->name);
 		if (ret) {
 			pr_err("%s: failed to declare cma region %s (%d)\n",
 			       __func__, heap_data->name, ret);
@@ -536,6 +537,33 @@ err:
 	return ret;
 }
 
+static int ion_oomdebug_notify(struct notifier_block *self,
+			       unsigned long dummy, void *parm)
+{
+	struct rb_node *n;
+
+	pr_info("-------------------- ion buffers -------------------------\n");
+	pr_info("%10.s %2.s %4.s %6.s %16.s %10.s %8.s\n",
+		"heap", "id", "type", "pid", "task", "size", "flag");
+	pr_info("----------------------------------------------------------\n");
+
+	mutex_lock(&ion_exynos->buffer_lock);
+	for (n = rb_first(&ion_exynos->buffers); n; n = rb_next(n)) {
+		struct ion_buffer *buf = rb_entry(n, struct ion_buffer, node);
+
+		pr_info("%10.s %2u %4u %6u %16.s %10zu %#8lx\n",
+			buf->heap->name, buf->heap->id, buf->heap->type,
+			buf->pid, buf->task_comm, buf->size, buf->flags);
+	}
+	mutex_unlock(&ion_exynos->buffer_lock);
+
+	return NOTIFY_OK;
+}
+
+static struct notifier_block ion_oomdebug_nb = {
+	.notifier_call = ion_oomdebug_notify,
+};
+
 static long exynos_custom_ioctl(struct ion_client *client, unsigned int cmd,
 				unsigned long arg)
 {
@@ -549,6 +577,28 @@ static long exynos_custom_ioctl(struct ion_client *client, unsigned int cmd,
 	return ret;
 }
 
+static int ion_system_heap_size_notifier(struct notifier_block *nb,
+					 unsigned long action, void *data)
+{
+	show_ion_system_heap_size((struct seq_file *)data);
+	return 0;
+}
+
+static struct notifier_block ion_system_heap_nb = {
+	.notifier_call = ion_system_heap_size_notifier,
+};
+
+static int ion_system_heap_pool_size_notifier(struct notifier_block *nb,
+					      unsigned long action, void *data)
+{
+	show_ion_system_heap_pool_size((struct seq_file *)data);
+	return 0;
+}
+
+static struct notifier_block ion_system_heap_pool_nb = {
+	.notifier_call = ion_system_heap_pool_size_notifier,
+};
+
 static int __init exynos_ion_init(void)
 {
 	ion_exynos = ion_device_create(exynos_custom_ioctl);
@@ -557,6 +607,11 @@ static int __init exynos_ion_init(void)
 		return PTR_ERR(ion_exynos);
 	}
 
+	if (register_oomdebug_notifier(&ion_oomdebug_nb) < 0)
+		pr_err("%s: failed to register oom debug notifier\n", __func__);
+
+	show_mem_extra_notifier_register(&ion_system_heap_nb);
+	show_mem_extra_notifier_register(&ion_system_heap_pool_nb);
 	return exynos_ion_populate_heaps(ion_exynos);
 }
 

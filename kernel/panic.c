@@ -248,7 +248,6 @@ void panic(const char *fmt, ...)
 		 */
 		crash_smp_send_stop();
 	}
-
 	/*
 	 * Run any panic handlers, including those that might need to
 	 * add information to the kmsg dump output.

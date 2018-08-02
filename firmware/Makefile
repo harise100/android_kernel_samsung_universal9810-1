@@ -150,6 +150,8 @@ fw-shipped-$(CONFIG_EPEN_WACOM_W9018) += epen/w9018_crown_fac.fw
 endif
 
 
+fw-shipped-$(CONFIG_FIVE_TEE_DRIVER) += five/ffffffff000000000000000000000072.tlbin
+
 fw-shipped-all := $(fw-shipped-y) $(fw-shipped-m) $(fw-shipped-)
 
 quiet_cmd_ihex  = IHEX    $@

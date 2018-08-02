@@ -287,6 +287,7 @@ retry:
 			pgmap = NULL;
 		}
 	}
+
 	if (flags & FOLL_TOUCH) {
 		if ((flags & FOLL_WRITE) &&
 		    !pte_dirty(pte) && !PageDirty(page))
@@ -1579,7 +1580,6 @@ int __get_user_pages_fast(unsigned long start, int nr_pages, int write,
 	 * We do not adopt an rcu_read_lock(.) here as we also want to
 	 * block IPIs that come from THPs splitting.
 	 */
-
 	local_irq_save(flags);
 	pgdp = pgd_offset(mm, addr);
 	do {

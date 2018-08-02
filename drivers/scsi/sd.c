@@ -3295,6 +3295,12 @@ static int sd_probe(struct device *dev)
 		q->nr_requests = BLKDEV_MAX_RQ / 8;
 		if (q->nr_requests < 32)
 			q->nr_requests = 32;
+#ifdef CONFIG_LARGE_DIRTY_BUFFER
+		/* apply more throttle on non-ufs scsi device */
+		q->backing_dev_info.capabilities |= BDI_CAP_STRICTLIMIT;
+		bdi_set_min_ratio(&q->backing_dev_info, 20);
+		bdi_set_max_ratio(&q->backing_dev_info, 20);
+#endif
 		pr_info("Parameters for SCSI-dev(%s): min/max_ratio: %u/%u "
 			"strictlimit: on nr_requests: %lu read_ahead_kb: %lu\n",
 			gd->disk_name,

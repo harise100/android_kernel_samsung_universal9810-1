@@ -1046,7 +1046,7 @@ void proc_sched_show_task(struct task_struct *p, struct seq_file *m)
 		/* select_task_rq_fair() */
 		P_SCHEDSTAT(se.statistics.nr_wakeups_cas_attempts);
 		P_SCHEDSTAT(se.statistics.nr_wakeups_cas_count);
- 
+
 		avg_atom = p->se.sum_exec_runtime;
 		if (nr_switches)
 			avg_atom = div64_ul(avg_atom, nr_switches);

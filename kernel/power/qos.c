@@ -188,7 +188,6 @@ static struct pm_qos_object network_throughput_pm_qos = {
 	.name = "network_throughput",
 };
 
-
 static BLOCKING_NOTIFIER_HEAD(memory_bandwidth_notifier);
 static struct pm_qos_constraints memory_bw_constraints = {
 	.list = PLIST_HEAD_INIT(memory_bw_constraints.list),
@@ -631,6 +630,7 @@ int pm_qos_update_target(struct pm_qos_constraints *c, struct plist_node *node,
 	int ret;
 
 	spin_lock_irqsave(&pm_qos_lock, flags);
+
 	prev_value = pm_qos_get_value(c);
 	if (value == PM_QOS_DEFAULT_VALUE)
 		new_value = c->default_value;
@@ -1167,7 +1167,6 @@ static ssize_t pm_qos_power_write(struct file *filp, const char __user *buf,
 
 	return count;
 }
-
 
 static int __init pm_qos_power_init(void)
 {
