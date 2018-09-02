@@ -8,6 +8,17 @@ menu "File systems"
 config DCACHE_WORD_ACCESS
        bool
 
+config FS_EPOLL_WAKEUP_DEBUG
+	bool "debug eventpoll wakeup source"
+	default n
+	help
+	  This option enables printing thread ID and name of eventpoll wakeup source
+	  while waking up system for debug purpose. Keep it off if not sure.
+
+config INTERRUPTIBLE_SYNC
+        bool "Support interruptible sync for Samsung Mobile Device"
+	default y
+
 if BLOCK
 
 config FS_IOMAP
@@ -126,6 +137,7 @@ menu "DOS/FAT/NT Filesystems"
 
 source "fs/fat/Kconfig"
 source "fs/ntfs/Kconfig"
+source "fs/sdfat/Kconfig"
 
 endmenu
 endif # BLOCK

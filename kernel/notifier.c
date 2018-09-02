@@ -5,6 +5,8 @@
 #include <linux/rcupdate.h>
 #include <linux/vmalloc.h>
 #include <linux/reboot.h>
+#include <linux/suspend.h>
+#include <linux/exynos-ss.h>
 
 /*
  *	Notifier list for kernel code which wants to be called
@@ -77,6 +79,10 @@ static int notifier_call_chain(struct notifier_block **nl,
 {
 	int ret = NOTIFY_DONE;
 	struct notifier_block *nb, *next_nb;
+#ifdef CONFIG_DEBUG_NOTIFIERS_PRINT_ELAPSED_TIME
+	unsigned long start, end;
+	int elapsed;
+#endif
 
 	nb = rcu_dereference_raw(*nl);
 
@@ -90,7 +96,24 @@ static int notifier_call_chain(struct notifier_block **nl,
 			continue;
 		}
 #endif
+		if (val == PM_SUSPEND_PREPARE || val == PM_POST_SUSPEND)
+			exynos_ss_suspend(nb->notifier_call, NULL, ESS_FLAG_IN);
+#ifdef CONFIG_DEBUG_NOTIFIERS_PRINT_ELAPSED_TIME
+		if (val == PM_SUSPEND_PREPARE)
+			start = jiffies;
+#endif
 		ret = nb->notifier_call(nb, val, v);
+#ifdef CONFIG_DEBUG_NOTIFIERS_PRINT_ELAPSED_TIME
+		if (val == PM_SUSPEND_PREPARE) {
+			end = jiffies;
+			elapsed = jiffies_to_usecs(end - start);
+			if( elapsed > 4000)
+				printk(KERN_ERR "%s: %pS takes over 4000(%d) usec for execution.\n", 
+					__func__, (void *)(nb->notifier_call), elapsed);
+		}
+#endif
+		if (val == PM_SUSPEND_PREPARE || val == PM_POST_SUSPEND)
+			exynos_ss_suspend(nb->notifier_call, NULL, ESS_FLAG_OUT);
 
 		if (nr_calls)
 			(*nr_calls)++;

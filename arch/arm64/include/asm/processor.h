@@ -106,6 +106,7 @@ struct thread_struct {
 	unsigned long		tp2_value;
 #endif
 	struct fpsimd_state	fpsimd_state;
+	struct fpsimd_kernel_state fpsimd_kernel_state;
 	unsigned long		fault_address;	/* fault info */
 	unsigned long		fault_code;	/* ESR_EL1 value */
 	struct debug_info	debug;		/* debugging */
@@ -190,21 +191,21 @@ extern struct task_struct *cpu_switch_to(struct task_struct *prev,
 #define ARCH_HAS_PREFETCH
 static inline void prefetch(const void *ptr)
 {
-	asm volatile("prfm pldl1keep, %a0\n" : : "p" (ptr));
+	asm volatile("prfm pldl1keep, [%x0]\n" : : "r" (ptr));
 }
 
 #define ARCH_HAS_PREFETCHW
 static inline void prefetchw(const void *ptr)
 {
-	asm volatile("prfm pstl1keep, %a0\n" : : "p" (ptr));
+	asm volatile("prfm pstl1keep, [%x0]\n" : : "r" (ptr));
 }
 
 #define ARCH_HAS_SPINLOCK_PREFETCH
 static inline void spin_lock_prefetch(const void *ptr)
 {
 	asm volatile(ARM64_LSE_ATOMIC_INSN(
-		     "prfm pstl1strm, %a0",
-		     "nop") : : "p" (ptr));
+		     "prfm pstl1strm, [%x0]",
+		     "nop") : : "r" (ptr));
 }
 
 #define HAVE_ARCH_PICK_MMAP_LAYOUT
