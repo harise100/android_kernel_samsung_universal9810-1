@@ -121,6 +121,8 @@ ifeq ($(KBUILD_SRC),)
 # Do we want to locate output files in a separate directory?
 ifeq ("$(origin O)", "command line")
   KBUILD_OUTPUT := $(O)
+else
+  KBUILD_OUTPUT := $(CURDIR)/../kernel_out/KERNEL_OBJ
 endif
 
 # That's our default target when none is given on the command line
@@ -257,7 +259,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
 #ARCH		?= $(SUBARCH)
 #CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 ARCH            ?= arm64
-CROSS_COMPILE   ?= ../PLATFORM/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/bin/aarch64-linux-android-
+CROSS_COMPILE   ?= $(HOME)/android/toolchain/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 #CROSS_COMPILE   ?= /opt/toolchains/aarch64-linux-android-4.9/bin/aarch64-linux-android-
 
 # Architecture as present in compile.h
@@ -351,7 +353,7 @@ include scripts/Kbuild.include
 # Make variables (CC, etc...)
 AS		= $(CROSS_COMPILE)as
 LD		= $(CROSS_COMPILE)ld
-CC		= $(CROSS_COMPILE)gcc
+CC		= $(HOME)/android/toolchain/clang/clang-4053586/bin/clang
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)ar
 NM		= $(CROSS_COMPILE)nm
@@ -629,7 +631,7 @@ export CFLAGS_GCOV CFLAGS_KCOV
 
 ifeq ($(cc-name),clang)
 ifneq ($(CROSS_COMPILE),)
-CLANG_TRIPLE    ?= $(CROSS_COMPILE)
+CLANG_TRIPLE    ?= aarch64-linux-gnu-
 CLANG_TARGET	:= --target=$(notdir $(CLANG_TRIPLE:%-=%))
 GCC_TOOLCHAIN	:= $(realpath $(dir $(shell which $(LD)))/..)
 endif
